@@ -6,32 +6,44 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Hahn.ApplicatonProcess.December2020.Web.Models;
+using Hahn.ApplicatonProcess.December2020.Web.Models.Resource;
+using Hahn.ApplicatonProcess.December2020.Domain.Interfaces;
 
 namespace Hahn.ApplicatonProcess.December2020.Web.Controllers
 {
-    public class HomeController : Controller
+    [ApiController]
+    public class HomeController : ControllerBase
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IApplicantService applicantService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(/* ILogger<HomeController> logger */IApplicantService applicantService)
         {
-            _logger = logger;
+            this.applicantService = applicantService;
+            //_logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Get(int id)
         {
-            return View();
+            if (id < 1)
+                return BadRequest("Invalid Id");
+
+            ApplicantResource applicantResource = new();
+            //applicantResource = applicantService.GetApplicant(id);
+
+
+            return Ok(applicantResource);
         }
 
         public IActionResult Privacy()
         {
-            return View();
+            return Ok();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return Ok(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
