@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Hahn.ApplicatonProcess.December2020.Web.Models;
-using Hahn.ApplicatonProcess.December2020.Web.Models.Resource;
-using Hahn.ApplicatonProcess.December2020.Domain.Interfaces;
+using Hahn.ApplicatonProcess.December2020.Web.Models;using Hahn.ApplicatonProcess.December2020.Domain.Interfaces;
+using AutoMapper;
+using Hahn.ApplicatonProcess.December2020.Data.Resource;
 
 namespace Hahn.ApplicatonProcess.December2020.Web.Controllers
 {
@@ -16,10 +12,12 @@ namespace Hahn.ApplicatonProcess.December2020.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IApplicantService applicantService;
+        private readonly IMapper mapper;
 
-        public HomeController(/* ILogger<HomeController> logger */IApplicantService applicantService)
+        public HomeController(/* ILogger<HomeController> logger */IApplicantService applicantService, IMapper mapper)
         {
             this.applicantService = applicantService;
+            this.mapper = mapper;
             //_logger = logger;
         }
 
@@ -29,8 +27,11 @@ namespace Hahn.ApplicatonProcess.December2020.Web.Controllers
                 return BadRequest("Invalid Id");
 
             ApplicantResource applicantResource = new();
-            //applicantResource = applicantService.GetApplicant(id);
-
+            var applicant = applicantService.GetApplicant(id);
+            if (applicant == null)
+                return NotFound();
+            
+            applicantResource = mapper.Map<ApplicantResource>(applicant);
 
             return Ok(applicantResource);
         }
